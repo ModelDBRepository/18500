@@ -1,0 +1,52 @@
+load_file("nrngui.hoc")
+
+strdef tstr
+double duration[1]
+
+// Kinetic models of synaptic transmission
+// Alain Destexhe, Zachary F. Mainen and Terrence J. Sejnowski
+// In: Methods in Neuronal Modeling , 2nd Edition,
+// Edited by Koch, C. and Segev, I., MIT Press, Cambridge, MA, 1998, pp. 1-25.
+
+proc restart() {local i
+	for i=0, n_graph_lists-1 {
+		graphList[i].remove_all()
+	}
+	flush_list.remove_all()
+	fast_flush_list.remove_all()
+	doNotify()
+	for (i= PWManager[0].count-1; i >= pwmcnt; i -= 1) {
+		PWManager[0].close(i)
+		doNotify()
+	}
+
+	sprint(tstr, "%s.oc", $s1)
+	load_file(1, tstr)
+	set_dur()
+	init()
+	run()
+}
+
+xpanel("Figures for Destexhe, Mainen, and Sejnowski 1998")
+
+xlabel("Figures for Destexhe, Mainen, and Sejnowski")
+xlabel("Kinetic models of synaptic transmission")
+xlabel("In: Methods in Neuronal Modeling , 2nd Edition")
+xlabel("Edited by Koch, C. and Segev, I., MIT Press, Cambridge, MA, 1998, pp. 1-25.")
+
+xradiobutton("fig 1.4A left ", "duration = 2 restart(\"demo_ampa\")")
+xradiobutton("fig 1.4A right", "{duration = 10 restart(\"demo_ampa\")}")
+xradiobutton("fig 1.4B left", "{duration = 2 restart(\"demo_nmda\")}")
+xradiobutton("fig 1.4B right", "{duration = 10 restart(\"demo_nmda\")}")
+xradiobutton("fig 1.4C left ", "{duration = 2 restart(\"demo_gabaa\")}")
+xradiobutton("fig 1.4C right ", "{duration = 10 restart(\"demo_gabaa\")}")
+xradiobutton("fig 1.4D left ", "{duration = 2 restart(\"demo_gabab\")}")
+xradiobutton("fig 1.4C right ", "{duration = 10 restart(\"demo_gabab\")}")
+
+xpanel(5,100)
+
+pwmcnt = PWManager[0].count // the initial gui should not be dismissed
+
+proc set_dur() {
+  execute("stim.dur = duration")
+}

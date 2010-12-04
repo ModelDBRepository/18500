@@ -1,0 +1,134 @@
+/*----------------------------------------------------------------------------
+
+	demo file for first order kinetic synapse mechanism
+	---------------------------------------------------
+
+	This file provides a simulation of GABAergic IPSP's in a passive
+	compartment.  A presyaptic compartment (PRE) is created and 
+	contains Hodgkin-Huxley Na/K currents for generating action potentials.
+	A current pulse is injected in PRE to elicit a train of spikes.
+	For each spike an IPSP is generated in the postsynaptic compartment
+	(POST).  The number of presynaptic spikes can be adjusted by changing
+        the pulse duration (stim.dur).
+
+	Whole-cell recorded GABA-B postsynaptic currents (Otis et al,
+        J. Physiol. 463: 391-407, 1993) were used to estimate the parameters
+	of the present simulations; the fit was performed using a simplex
+	algorithm (see Destexhe et al., J. Neurophysiol. 72: 803-818, 1994).
+
+
+	Alain Destexhe, The Salk Institute, 1994
+
+----------------------------------------------------------------------------*/
+
+
+
+//----------------------------------------------------------------------------
+//  load and define general graphical procedures
+//----------------------------------------------------------------------------
+
+// xopen("$(NEURONHOME)/lib/hoc/stdrun.hoc")
+load_file("nrngui.hoc")
+
+objectvar g[20]			// max 20 graphs
+ngraph = 0
+
+proc addgraph() { local ii	// define subroutine to add a new graph
+				// addgraph("variable", minvalue, maxvalue)
+	ngraph = ngraph+1
+	ii = ngraph-1
+	g[ii] = new Graph()
+	g[ii].size(0,tstop,$2,$3)
+	g[ii].xaxis()
+	g[ii].yaxis()
+	g[ii].addvar($s1,1,0)
+	g[ii].save_name("graphList[0].")
+	graphList[0].append(g[ii])
+}
+
+// nrnmainmenu()			// create main menu
+nrncontrolmenu()		// crate control menu
+
+
+
+//----------------------------------------------------------------------------
+//  general parameters
+//----------------------------------------------------------------------------
+
+dt=0.1
+tstop = 500
+runStopAt = tstop
+steps_per_ms = 1/dt
+celsius = 36
+v_init = -70
+
+
+
+//----------------------------------------------------------------------------
+//  create compartments and insert passive properties
+//----------------------------------------------------------------------------
+
+create PRE,POST
+forall {
+  diam=10
+  L=10
+  insert pas
+  g_pas=1/5000
+  e_pas=v_init
+}
+
+
+
+//----------------------------------------------------------------------------
+//  insert presynaptic mechanisms
+//----------------------------------------------------------------------------
+
+access PRE		// insert Hodgk-Hux. Na+ and K+ currents for spikes
+insert hh2
+ek = -90
+gnabar_hh2 = 0.1
+gkbar_hh2 = 0.03
+
+objectvar stim		// insert current injection
+
+PRE stim = new IClamp(.5)	  // command for version nrn3a8 or newer
+// PRE stim = new PulseStim(.5)	  // command for older NEURON versions
+
+stim.del = 0
+stim.dur = 2		// 2 ms for single psp, 10 ms for train of psps
+stim.amp = 0.1
+
+
+
+
+//----------------------------------------------------------------------------
+//  insert postsynaptic mechansisms
+//----------------------------------------------------------------------------
+
+objectvar c
+c = new GABAb()			// create synapse
+POST c.loc(0.5)			// assign postsynaptic compartment
+setpointer c.pre, PRE.v(0.5)	// assign presynaptic compartment
+
+Cmax_GABAb	= 1	//	(mM)	 max transmitter concentration
+Cdur_GABAb	= 84	//	(ms)	 transmitter duration (rising phase)
+Alpha_GABAb	= 0.016	//	(/ms mM) forward (binding) rate
+Beta_GABAb	= 0.0047 //	(/ms)	 backward (unbinding) rate
+Erev_GABAb	= -95	//	(mV)	 reversal potential
+Prethresh_GABAb	= 0 	//	(mV)	 voltage level nec for release
+Deadtime_GABAb	= 1	//	(ms)	 mimimum time between release events
+c.gmax		= 0.0001 //	(umho)	 maximum conductance
+
+
+
+//----------------------------------------------------------------------------
+//  add graphs
+//----------------------------------------------------------------------------
+
+addgraph("PRE.v(0.5)",-90,40)
+addgraph("c.C",0,1)
+g[1].addvar("c.R",1,0)
+addgraph("c.i",-0.00001,0.01)
+addgraph("POST.v(0.5)",v_init-5,v_init)
+
+

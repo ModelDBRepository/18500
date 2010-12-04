@@ -1,0 +1,121 @@
+Channels
+--------
+
+Simulations that illustrates the application of simple kinetic models for 
+the most current types of receptors: AMPA and NMDA glutamatergic, GABA-A
+and GABA-B gabaergic.  These simulations are related to the following
+book chapter- generates figures similar to fig 1.4 p19:
+
+   Alain Destexhe, Zachary F. Mainen and Terrence J. Sejnowski
+   Kinetic models of synaptic transmission
+   In: Methods in Neuronal Modeling , 2nd Edition, 
+   Edited by Koch, C. and Segev, I., MIT Press, Cambridge, MA, 1998, pp. 1-25. 
+
+   These papers are related:
+
+   Destexhe, A., Mainen, Z.F. and Sejnowski, T.J.  An efficient method for
+   computing synaptic conductances based on a kinetic model of receptor binding
+   Neural Computation 6: 10-14, 1994.
+
+   Destexhe, A., Mainen, Z.F. and Sejnowski, T.J. Synthesis of models for
+   excitable membranes, synaptic transmission and neuromodulation using a 
+   common kinetic formalism, Journal of Computational Neuroscience 1: 
+   195-230, 1994.
+
+   (see postscript files synapse.ps.Z and markovSynapse.ps.Z)
+
+   Destexhe, A., Mainen, Z.F. and Sejnowski, T.J.  Fast kinetic models for
+   simulating AMPA, NMDA, GABA(A) and GABA(B) receptors.  In: Computation and
+   Neural Systems, Vol. 4, Kluwer Academic Press, in press, 1995.
+
+   (see postscript file cns94.ps.Z)
+
+
+The present directory contains all the files needed to run the simulations
+using the Interviews version of NEURON.  These files are commented and should
+run straighforwardly, provided the NEURON simulator is installed properly.
+
+The kinetic synapse mechanism
+
+-----------------------------
+This mechanisms has the following properties:
+
+1. It is based on a simple kinetic scheme of binding of transmitter on
+   postsynaptic receptors.  This description has the advantage that
+   it is fully compatible with the level of description used for other
+   mechanisms (Hodgkin-Huxley currents, calcium diffusion, etc).
+
+2. The mechanism gives EPSP's or IPSP's from a pulse of transmitter.
+   The waveform of these PSP's is very close to EPSP's or IPSP's measured
+   experimentally, and the decay is monoexponential.  The user can set all
+   the parameters corresponding to the rising phase, decay, amplitude, etc...
+   (see .mod files)
+
+3. Summation of consecutive PSP's is handled automatically by the 
+   mechanism without need for an explicit event cue.  
+
+4. Each synapse has a state variable corresponding to the fraction of 
+   postsynaptic receptors in the open state.  However, the kinetics are
+   first order, and so can be solved exactly.  This has the important
+   advantage that it can be fit very easily to experimental recordings
+   (see J. Computational Neurosci. paper).
+
+5. Finally, this mechanism is very fast to compute. It does not require 
+   solving any differential equations; at any given time only one exponential
+   is calculated per synapse.  Thus, the mechanism is as fast to compute as 
+   optimized versions of alpha function-based models.
+
+
+
+How to run the simulation
+-------------------------
+
+This directory contains the files necessary to run a simulation of each
+type of receptor mentioned above.  The parameters have been obtained
+by fitting the model to whole-cell recordings of the various types of
+synaptic response (see individual .oc and .mod files for details).
+
+To compile the demo, NEURON and INTERVIEWS must be installed and working on
+the machine you are using.  Just type "nrnivmodl" to compile the mechanisms
+given in the mod files (glutamate.mod and gaba.mod are the mechanisms
+for glutamate and gaba synapses, and HH.mod is the Hodgkin-Huxley kinetics). 
+
+Then, execute one of the four example files by typing:
+
+nrngui <ocfile>
+
+where <ocfile> stands for either:
+
+ 	demo_ampa.oc	: AMPA/Kainate glutamatergic receptors
+	demo_nmda.oc	: NMDA glutamatergic receptors
+	demo_gabaa.oc	: GABA-A receptors
+	demo_gabab.oc	: GABA-B receptors
+
+Once the menu and graphics interface has appeared, click on "Init and Run"
+button to start the simulation...
+
+
+
+All these simulations were done using the NEURON simulator written by
+Michael Hines, and which is available freely on internet via anonymous
+ftp from neuron.neuro.duke.edu:/neuron.  For more information about how
+to get NEURON and how to install it, please refer to the following sites:
+
+  http://neuron.duke.edu/
+  http://www.neuron.yale.edu/
+
+
+For further information, please contact:
+
+Alain Destexhe
+CNRS, UNIC (Bat-33), 
+Avenue de la Terrasse,
+91198 Gif-sur-Yvette, 
+France
+
+email: Destexhe@iaf.cnrs-gif.fr
+http://cns.iaf.cnrs-gif.fr
+
+20071004 changed all synapse mod files so that they now use the
+counter mechanism. -Destexhe.
+
