@@ -118,4 +118,7 @@ http://cns.iaf.cnrs-gif.fr
 
 20071004 changed all synapse mod files so that they now use the
 counter mechanism. -Destexhe.
-
+20110411 changed solve method to cnexp in gabab.mod as per
+"Integration methods for SOLVE statements" topic in the NEURON forum
+http://www.neuron.yale.edu/phpBB/viewtopic.php?f=28&t=592
+-ModelDB Adminsitrator
